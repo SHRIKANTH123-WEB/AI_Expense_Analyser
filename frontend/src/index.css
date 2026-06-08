@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Disable stray text cursor carets on non-input elements */
+* {
+  caret-color: transparent;
+}
+input, textarea, select, [contenteditable], [contenteditable="true"] {
+  caret-color: var(--green-accent, #10B981) !important;
+}
+
+:root {
+  /* Default Dark Mode CSS Variables */
+  --bg-color: #040815;
+  --inner-color: #070C1E;
+  --card-color: #0C1226;
+  --border-color: rgba(255, 255, 255, 0.04);
+  --text-color: #f1f5f9;
+  --green-accent: #10B981;
+  --orange-accent: #FF5500;
+}
+
+/* Global Greyscale for Professional Placement Look */
+html {
+  filter: grayscale(100%);
+}
+
+/* Light Mode Overrides - Using a clever CSS filter inversion to perfectly flip all Tailwind Dark Mode classes to Light Mode instantly! */
+html.light {
+  filter: invert(1) grayscale(100%) brightness(105%);
+}
+
+/* Extra Contrast Grayscale Accessibility Mode */
+html.grayscale-theme {
+  filter: grayscale(100%) contrast(115%) !important;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    @apply selection:bg-brand-green selection:text-white antialiased transition-colors duration-300;
+  }
+}
+
+/* Custom Outlined Dribbble Layout Blocks */
+.glass-panel {
+  background-color: var(--card-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+}
+
+.glass-panel-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* active navigation item */
+.active-nav-link {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 100%);
+  border-left: 3px solid var(--green-accent);
+  color: var(--text-color);
+}
+
+html.light .active-nav-link {
+  background: linear-gradient(90deg, rgba(5, 150, 105, 0.08) 0%, rgba(5, 150, 105, 0) 100%);
+}
+
+/* Custom Scrollbar for list tables */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--green-accent);
+}
+
+/* Slide animations */
+@keyframes slideIn {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
