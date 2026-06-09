@@ -19,7 +19,14 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwt_secret_default_key_123');
 
       // Get user from token and attach to request
-      req.user = await UserModel.findById(decoded.id).select('-password');
+      try {
+        req.user = await UserModel.findById(decoded.id).select('-password');
+      } catch (dbErr) {
+        if (dbErr.name === 'CastError') {
+          return res.status(401).json({ message: 'Not authorized, session database mismatch' });
+        }
+        throw dbErr;
+      }
       
       if (!req.user) {
         return res.status(401).json({ message: 'Not authorized, user not found' });
@@ -28,12 +35,12 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.error('Auth verification error:', error);
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
 
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token provided' });
+    return res.status(401).json({ message: 'Not authorized, no token provided' });
   }
 };
 
