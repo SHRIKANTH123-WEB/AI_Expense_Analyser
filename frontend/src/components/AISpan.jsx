@@ -196,6 +196,19 @@ const AISpan = () => {
             )}
           </div>
 
+          {/* Strategic Advice */}
+          {currentReport.financialAdvice && (
+            <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-900/60">
+              <div className="flex items-center gap-1.5 mb-2 text-slate-200">
+                <Brain className="h-4 w-4 text-brand-green" />
+                <h4 className="text-[11px] font-bold uppercase tracking-wider">Strategic Advice</h4>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed font-sans font-medium">
+                {currentReport.financialAdvice}
+              </p>
+            </div>
+          )}
+
           {/* Strategic Note */}
           <div className="text-[10px] text-slate-550 flex items-center justify-between mt-2 pt-2 border-t border-slate-900/60">
             <span className="flex items-center gap-1">
