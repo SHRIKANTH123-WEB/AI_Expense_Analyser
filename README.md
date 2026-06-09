@@ -1,5 +1,7 @@
 # SpendWise AI: Personal Expense Analyzer
 
+**Frontend Development URL:** [http://localhost:5173](http://localhost:5173)
+
 SpendWise is a responsive, modern full-stack application built to log personal expenses and generate strategic, category-wise financial audits using the Gemini API.
 
 ---
