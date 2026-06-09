@@ -3,27 +3,39 @@ import { IndianRupee, Calendar, TrendingUp, PiggyBank, ArrowUpRight } from 'luci
 
 const StatsCards = ({ expenses }) => {
   // Calculate analytics
-  const total = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const total = expenses.reduce((acc, curr) => {
+    const amt = curr && typeof curr.amount === 'number' ? curr.amount : parseFloat(curr?.amount) || 0;
+    return acc + amt;
+  }, 0);
 
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
   
   const monthlyExpenses = expenses.filter(exp => {
+    if (!exp || !exp.date) return false;
     const expDate = new Date(exp.date);
+    if (isNaN(expDate.getTime())) return false;
     return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
   });
 
-  const monthlyTotal = monthlyExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const monthlyTotal = monthlyExpenses.reduce((acc, curr) => {
+    const amt = curr && typeof curr.amount === 'number' ? curr.amount : parseFloat(curr?.amount) || 0;
+    return acc + amt;
+  }, 0);
   
   // Set standard budget limit
-  const monthlyBudget = 1500;
-  const budgetPercentage = Math.min(100, Math.round((monthlyTotal / monthlyBudget) * 100));
+  const monthlyBudget = 15000; // Increased budget limit from 1500 to 15000 to match realistic Rupee expenditures
+  const budgetPercentage = Math.min(100, Math.round((monthlyTotal / monthlyBudget) * 100)) || 0;
 
   // Determine highest spending category
   const categories = {};
   expenses.forEach(exp => {
-    categories[exp.category] = (categories[exp.category] || 0) + exp.amount;
+    if (exp) {
+      const cat = exp.category || 'Other';
+      const amt = typeof exp.amount === 'number' ? exp.amount : parseFloat(exp.amount) || 0;
+      categories[cat] = (categories[cat] || 0) + amt;
+    }
   });
 
   let highestCat = 'N/A';

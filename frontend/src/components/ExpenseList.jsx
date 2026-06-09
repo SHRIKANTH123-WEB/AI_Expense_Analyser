@@ -51,7 +51,7 @@ const ExpenseList = ({ onEdit }) => {
       new Date(exp.date).toLocaleDateString(),
       `"${exp.title.replace(/"/g, '""')}"`,
       exp.category,
-      exp.amount.toFixed(2),
+      (typeof exp.amount === 'number' ? exp.amount : parseFloat(exp.amount) || 0).toFixed(2),
       `"${(exp.description || '').replace(/"/g, '""')}"`,
     ]);
 
@@ -208,7 +208,7 @@ const ExpenseList = ({ onEdit }) => {
                     })}
                   </td>
                   <td className="py-3.5 px-4 font-extrabold text-white text-right text-sm">
-                    ₹{exp.amount.toFixed(2)}
+                    ₹{(typeof exp.amount === 'number' ? exp.amount : parseFloat(exp.amount) || 0).toFixed(2)}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <div className="flex items-center justify-end gap-1.5">

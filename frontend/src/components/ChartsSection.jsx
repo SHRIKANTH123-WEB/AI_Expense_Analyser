@@ -28,39 +28,55 @@ const ChartsSection = ({ expenses }) => {
   // --- 1. Prepare Category Breakdown Data (Pie Chart) ---
   const categoryMap = {};
   expenses.forEach((exp) => {
-    categoryMap[exp.category] = (categoryMap[exp.category] || 0) + exp.amount;
+    if (exp) {
+      const cat = exp.category || 'Other';
+      const amt = typeof exp.amount === 'number' ? exp.amount : parseFloat(exp.amount) || 0;
+      categoryMap[cat] = (categoryMap[cat] || 0) + amt;
+    }
   });
 
   const pieData = Object.entries(categoryMap).map(([name, value]) => ({
     name,
-    value: parseFloat(value.toFixed(2)),
+    value: parseFloat((value || 0).toFixed(2)),
   })).sort((a, b) => b.value - a.value);
 
   // --- 2. Prepare Trend Data (Area Chart) ---
   const trendMap = {};
   expenses.forEach((exp) => {
-    const dateStr = new Date(exp.date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-    trendMap[dateStr] = (trendMap[dateStr] || 0) + exp.amount;
+    if (exp) {
+      let dateStr = 'Unknown';
+      try {
+        const d = new Date(exp.date);
+        if (!isNaN(d.getTime())) {
+          dateStr = d.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          });
+        }
+      } catch (e) {
+        console.error('Date parsing error:', e);
+      }
+      const amt = typeof exp.amount === 'number' ? exp.amount : parseFloat(exp.amount) || 0;
+      trendMap[dateStr] = (trendMap[dateStr] || 0) + amt;
+    }
   });
 
   const trendData = Object.entries(trendMap)
     .map(([date, amount]) => ({
       date,
-      Amount: parseFloat(amount.toFixed(2)),
+      Amount: parseFloat((amount || 0).toFixed(2)),
     }))
     .reverse()
     .slice(-15);
 
   const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
+    if (active && payload && payload.length && payload[0]) {
+      const val = payload[0].value;
       return (
         <div className="bg-[#0C1226] border border-slate-800 p-3 rounded-xl shadow-xl backdrop-blur-md text-xs">
           <p className="text-slate-400 font-semibold mb-1">{label}</p>
           <p className="text-brand-green font-bold">
-            ₹{payload[0].value.toFixed(2)}
+            ₹{typeof val === 'number' ? val.toFixed(2) : parseFloat(val || 0).toFixed(2)}
           </p>
         </div>
       );
@@ -69,7 +85,7 @@ const ChartsSection = ({ expenses }) => {
   };
 
   const CustomPieTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
+    if (active && payload && payload.length && payload[0]) {
       const { name, value } = payload[0];
       return (
         <div className="bg-[#0C1226] border border-slate-800 p-3 rounded-xl shadow-xl backdrop-blur-md text-xs flex flex-col gap-1">
@@ -77,7 +93,7 @@ const ChartsSection = ({ expenses }) => {
             {name}
           </p>
           <p className="text-slate-350 font-bold">
-            ₹{value.toFixed(2)}
+            ₹{typeof value === 'number' ? value.toFixed(2) : parseFloat(value || 0).toFixed(2)}
           </p>
         </div>
       );
