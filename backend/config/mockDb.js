@@ -36,7 +36,7 @@ const writeDb = (data) => {
 const generateId = () => Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
 
 const MockUser = {
-  findOne: async (query) => {
+  findOne: (query) => {
     const db = readDb();
     const user = db.users.find(u => {
       if (query.email && u.email.toLowerCase() === query.email.toLowerCase()) return true;
@@ -44,28 +44,33 @@ const MockUser = {
       if (query._id && u._id === query._id) return true;
       return false;
     });
+    let result = null;
     if (user) {
-      return {
+      result = {
         ...user,
         matchPassword: async function(enteredPassword) {
           return await bcrypt.compare(enteredPassword, this.password);
         }
       };
     }
-    return null;
+    const promise = Promise.resolve(result);
+    promise.select = function() { return this; };
+    return promise;
   },
-  findById: async (id) => {
+  findById: (id) => {
     const db = readDb();
     const user = db.users.find(u => u._id === id);
+    let result = null;
     if (user) {
-      return {
+      result = {
         _id: user._id,
         username: user.username,
         email: user.email,
-        select: function() { return this; }
       };
     }
-    return null;
+    const promise = Promise.resolve(result);
+    promise.select = function() { return this; };
+    return promise;
   },
   create: async (userData) => {
     const db = readDb();

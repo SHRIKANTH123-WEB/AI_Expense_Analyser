@@ -22,6 +22,28 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  // Register Axios response interceptor to handle 401 globally
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          console.warn('Unauthorized (401) response received, logging out user...');
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
   // Load user profile on startup if token exists
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -85,11 +107,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
   };
 
   return (
