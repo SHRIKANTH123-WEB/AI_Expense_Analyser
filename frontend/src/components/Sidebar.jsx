@@ -20,7 +20,7 @@ const Sidebar = ({ onAddExpenseClick, isOpen, toggleSidebar }) => {
       {/* Sidebar Container */}
       <aside
         className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col w-64 bg-[#0C1226] border-r border-slate-900/60 transform lg:transform-none transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-0 lg:translate-x-0'
+          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Brand Header */}
