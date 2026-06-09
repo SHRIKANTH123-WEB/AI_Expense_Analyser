@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const UserMongoose = require('../models/User');
+const { MockUser } = require('../config/mockDb');
 const { protect } = require('../middleware/auth');
+
+const getUserModel = () => global.useMockDb ? MockUser : UserMongoose;
 
 // Helper to generate JWT token
 const generateToken = (id) => {
@@ -18,24 +21,25 @@ router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
+    const UserModel = getUserModel();
     // Basic validation
     if (!username || !email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
     }
 
     // Check if user already exists (by email or username)
-    const emailExists = await User.findOne({ email });
+    const emailExists = await UserModel.findOne({ email });
     if (emailExists) {
       return res.status(400).json({ message: 'User with this email already exists' });
     }
 
-    const usernameExists = await User.findOne({ username });
+    const usernameExists = await UserModel.findOne({ username });
     if (usernameExists) {
       return res.status(400).json({ message: 'Username is already taken' });
     }
 
     // Create user (pre-save hook hashes password)
-    const user = await User.create({
+    const user = await UserModel.create({
       username,
       email,
       password,
@@ -64,12 +68,13 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    const UserModel = getUserModel();
     if (!email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
     }
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await UserModel.findOne({ email });
 
     // Validate password
     if (user && (await user.matchPassword(password))) {
@@ -93,7 +98,8 @@ router.post('/login', async (req, res) => {
 // @access  Private
 router.get('/me', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const UserModel = getUserModel();
+    const user = await UserModel.findById(req.user._id).select('-password');
     res.json(user);
   } catch (error) {
     console.error('Get profile error:', error);

@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const Expense = require('../models/Expense');
+const ExpenseMongoose = require('../models/Expense');
+const { MockExpense } = require('../config/mockDb');
 const { protect } = require('../middleware/auth');
+
+const getExpenseModel = () => global.useMockDb ? MockExpense : ExpenseMongoose;
 
 // @route   GET /api/expenses
 // @desc    Get user's expenses with search & filters
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
+    const ExpenseModel = getExpenseModel();
     const { search, category, startDate, endDate } = req.query;
     
     // Construct query object
-    const query = { userId: req.user._id };
+    const query = { userId: req.user._id.toString() };
 
     // Search filter (title or description case-insensitive)
     if (search) {
@@ -41,7 +45,7 @@ router.get('/', protect, async (req, res) => {
     }
 
     // Fetch matching expenses sorted by date descending
-    const expenses = await Expense.find(query).sort({ date: -1 });
+    const expenses = await ExpenseModel.find(query).sort({ date: -1 });
     res.json(expenses);
   } catch (error) {
     console.error('Fetch expenses error:', error);
@@ -53,6 +57,7 @@ router.get('/', protect, async (req, res) => {
 // @desc    Add a new expense
 // @access  Private
 router.post('/', protect, async (req, res) => {
+  const ExpenseModel = getExpenseModel();
   const { title, amount, category, date, description } = req.body;
 
   try {
@@ -60,8 +65,8 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({ message: 'Title, amount, and category are required' });
     }
 
-    const expense = await Expense.create({
-      userId: req.user._id,
+    const expense = await ExpenseModel.create({
+      userId: req.user._id.toString(),
       title,
       amount: Number(amount),
       category,
@@ -80,10 +85,11 @@ router.post('/', protect, async (req, res) => {
 // @desc    Update an expense
 // @access  Private
 router.put('/:id', protect, async (req, res) => {
+  const ExpenseModel = getExpenseModel();
   const { title, amount, category, date, description } = req.body;
 
   try {
-    let expense = await Expense.findById(req.params.id);
+    let expense = await ExpenseModel.findById(req.params.id);
 
     if (!expense) {
       return res.status(404).json({ message: 'Expense not found' });
@@ -113,8 +119,9 @@ router.put('/:id', protect, async (req, res) => {
 // @desc    Delete an expense
 // @access  Private
 router.delete('/:id', protect, async (req, res) => {
+  const ExpenseModel = getExpenseModel();
   try {
-    const expense = await Expense.findById(req.params.id);
+    const expense = await ExpenseModel.findById(req.params.id);
 
     if (!expense) {
       return res.status(404).json({ message: 'Expense not found' });
